@@ -1,0 +1,27 @@
+name: Build MO files
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gettext
+
+    - name: Build MO files
+      run: |
+        for file in $(find . -name "*.po"); do
+          dir=$(dirname "${file}")
+          mkdir -p "${dir}/LC_MESSAGES"
+          msgfmt "${file}" -o "${dir}/LC_MESSAGES/$(basename "${file}" .po).mo"
+        done
